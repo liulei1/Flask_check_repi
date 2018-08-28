@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>Overview</h1>
+  <table border="8" cellpadding="5">
+    <thead>
+      <tr>
+        <td>表名</td>
+        <td>结果</td>
+      </tr>
+      {% for item in res%}
+      <tr>
+        <td>
+          {{item.name}}
+        </td>
+        <td>
+          {{item.result}}
+        </td>
+      </tr>
+    {% endfor %}
+    </thead>
+  </table>
+{% endblock %}

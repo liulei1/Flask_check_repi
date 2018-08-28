@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 from bdpf.service import checkservice
 
 app = Flask(__name__)
-UPLOAD_FOLDER='upload'
+UPLOAD_FOLDER = 'upload'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=5)
@@ -17,7 +17,7 @@ ALLOWED_EXTENSIONS = set(['xlsx'])
 
 
 @app.route('/',methods=['GET'], strict_slashes=False)
-def indexpage():
+def index_page():
     return render_template('index.html')
 
 
@@ -36,18 +36,18 @@ def api_upload():
         f.save(os.path.join(file_dir,new_filename))
         f_path = file_dir+'/'+new_filename
         print(f_path)
-        checkservice.upload_check(f_path)
-
-        return "上传成功"
+        res_list = checkservice.upload_check(f_path)
+        return render_template('result.html', res= res_list)
+        # return "上传成功"
     else:
         return "上传文件失败"
 
 
 @app.route('/loginin', methods=['POST'])
-def signin():
+def sign_in():
     username = request.form['username']
     password = request.form['password']
-    if username=='xuyunlong' and password=='123456':
+    if username == 'xuyunlong' and password == '123456':
         return render_template('signin-ok.html', username=username)
     return render_template('form.html', message='Bad username or password', username=username)
 
