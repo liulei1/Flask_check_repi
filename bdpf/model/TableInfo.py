@@ -6,7 +6,7 @@ class TableInfo:
         self.t_cname = t_cname
         # 来源系统
         self.src_system = src_system
-        # 查重结果
+        # 查重结果（整型）0:不重复;1:重复;2:疑似重复
         self.result = result
         # 查重信息
         self.msg = msg
