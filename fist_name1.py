@@ -37,7 +37,7 @@ def api_upload():
         f_path = file_dir+'/'+new_filename
         print(f_path)
         res_list = checkservice.upload_check(f_path)
-        return render_template('result.html', res= res_list)
+        return render_template('result.html', res=res_list)
         # return "上传成功"
     else:
         return "上传文件失败"
@@ -63,6 +63,6 @@ def get_session():
 
 
 if __name__ == '__main__':
-    checkservice.upload_check('123')
+    # checkservice.upload_check('123')
     # app.run(host='0.0.0.0',port=8080)
     app.run(port=8080)
