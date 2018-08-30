@@ -1,5 +1,8 @@
+import configparser
+
 import pymysql
-import  configparser
+
+
 class Mysql_connect:
     def __init__(self):
         pass
