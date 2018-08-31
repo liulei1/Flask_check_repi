@@ -2,14 +2,14 @@
 <title>{% block title %}{% endblock %}大数据平台</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
-  <h1><a href="{{ url_for('auth.index') }}">大数据平台自动化查重门户</a></h1>
+  <h1><a href="{{ url_for('index_page') }}">大数据平台自动化查重门户</a></h1>
   <ul>
     {% if g.user %}
       <li><span>{{ g.user['username'] }}</span>
-      <li><a href="{{ url_for('auth.logout') }}">注销</a>
+      <li><a href="{{ url_for('logout') }}">注销</a>
    {# {% else %}
-      <li><a href="{{ url_for('auth.register') }}">注册</a>
-      <li><a href="{{ url_for('auth.login') }}">登录</a>  #}
+      <li><a href="{{ url_for('register') }}">注册</a>
+      <li><a href="{{ url_for('login') }}">登录</a>  #}
     {% endif %}
   </ul>
 </nav>
