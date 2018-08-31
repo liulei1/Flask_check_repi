@@ -1,24 +1,34 @@
 <!doctype html>
 <title>{% block title %}{% endblock %}大数据平台</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="{{ url_for('static', filename='jquery.js') }}"></script>
+<script src="{{ url_for('static', filename='bootstrap-3.3.7-dist/js/bootstrap.min.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-3.3.7-dist/css/bootstrap.min.css') }}">
+<div>
 <nav>
-  <h1><a href="{{ url_for('index_page') }}">大数据平台自动化查重门户</a></h1>
-  <ul>
-    {% if g.user %}
-      <li><span>{{ g.user['username'] }}</span>
-      <li><a href="{{ url_for('logout') }}">注销</a>
-   {# {% else %}
-      <li><a href="{{ url_for('register') }}">注册</a>
-      <li><a href="{{ url_for('login') }}">登录</a>  #}
-    {% endif %}
-  </ul>
+    <div>
+        <h1 style="height: 2em;text-align: center;">
+            <div style="padding-top:0.5em">大数据平台自动化查重门户</div>
+        </h1>
+    </div>
+
+    <ul>
+        {% if g.user %}
+        <li><span>{{ g.user['username'] }}</span>
+        <li><a href="{{ url_for('logout') }}">注销</a>
+            {# {% else %}
+        <li><a href="{{ url_for('register') }}">注册</a>
+        <li><a href="{{ url_for('login') }}">登录</a>  #}
+            {% endif %}
+    </ul>
 </nav>
 <section class="content">
-  <header>
-    {% block header %}{% endblock %}
-  </header>
-  {% for message in get_flashed_messages() %}
+    <header>
+        {% block header %}{% endblock %}
+    </header>
+    {% for message in get_flashed_messages() %}
     <div class="flash">{{ message }}</div>
-  {% endfor %}
-  {% block content %}{% endblock %}
+    {% endfor %}
+    {% block content %}{% endblock %}
 </section>
+</div>

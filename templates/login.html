@@ -1,22 +1,28 @@
 {% extends 'base.html' %}
 
 {# {% block header %}
-    <h1>{% block title %}Log In{% endblock %}</h1>
+<h1>{% block title %}Log In{% endblock %}</h1>
 {% endblock %} #}
 
 {% block content %}
-  <form method = "post">
-	  <li style="list-style-type:None">
-    <label for = "username"> 用户名：</label>
-	<input name = "username" id = "username">
-	  </li>
-	  <li style="list-style-type:None">
-	<label for = "password"> &nbsp;&nbsp;&nbsp;密码：</label>
-	<input type = "password" name = "password" id = "password">
-	  </li>
-	  <li style="list-style-type:None">
-		  <a href="{{url_for('register')}}"><input type = "button" value = "注册"></a>
-	      <input type = "submit" value = "登录">
-	  </li>
-  </form>
+<div style="width=60%;">
+    <form method = "post">
+        <div style="margin-left:40%">
+            <table>
+                <tr>
+                    <td style="height: 3em;">用户名</td>
+                    <td><input style="margin: 1em 1em 1em;" name = "username" id = "username"></td>
+                </tr>
+                <tr>
+                    <td style="height: 3em;">密&nbsp;&nbsp;码</td>
+                    <td><input style="margin: 1em 1em 1em;" type = "password" name = "password" id = "password"></td>
+                </tr>
+            </table>
+        </div>
+        <div style="margin-left:40%;margin-top:1em">
+            <a href="{{url_for('register')}}"><input style="min-width:4em;" type = "button" value = "注册"></a>
+            <input type="submit" style="min-width:4em;margin-left:4rem" value = "登录">
+        </div>
+    </form>
+</div>
 {% endblock %}
