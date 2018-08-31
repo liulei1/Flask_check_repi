@@ -6,7 +6,8 @@ import pymysql
 class Mysql_connect:
     def __init__(self):
         pass
-    def mysql_connect_select(self,sql):
+
+    def mysql_connect_select(self, sql):
         cp = configparser.ConfigParser()
         cp.read("../../config/config.cfg")
         mysql_host = cp.get("MYSQL", "host")

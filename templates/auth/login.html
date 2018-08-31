@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{# {% block header %}
+    <h1>{% block title %}Log In{% endblock %}</h1>
+{% endblock %} #}
+
+{% block content %}
+  <form method = "post">
+	  <li style="list-style-type:None">
+    <label for = "username"> 用户名：</label>
+	<input name = "username" id = "username">
+	  </li>
+	  <li style="list-style-type:None">
+	<label for = "password"> &nbsp;&nbsp;&nbsp;密码：</label>
+	<input type = "password" name = "password" id = "password">
+	  </li>
+	  <li style="list-style-type:None">
+		  <a href="{{url_for('auth.register')}}"><input type = "button" value = "注册"></a>
+	      <input type = "submit" value = "登录">
+	  </li>
+  </form>
+{% endblock %}

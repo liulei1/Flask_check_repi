@@ -1,5 +1,8 @@
 <!doctype html>
 <title>My Application</title>
+<script src="{{ url_for('static', filename='jquery.js') }}"></script>
+<script src="{{ url_for('static', filename='bootstrap-3.3.7-dist/js/bootstrap.min.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-3.3.7-dist/css/bootstrap.min.css') }}">
 {% with messages = get_flashed_messages() %}
   {% if messages %}
     <ul class=flashes>
