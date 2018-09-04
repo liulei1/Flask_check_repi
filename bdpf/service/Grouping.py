@@ -13,6 +13,7 @@ def GenGroup(requirements):
         else:
             x.result = '不重复'
             list_unmatch.append(x)
-    return (list_unmatch, list_match, list_maybe)
+    res: tuple = (list_unmatch, list_match, list_maybe)
+    return res
 
 

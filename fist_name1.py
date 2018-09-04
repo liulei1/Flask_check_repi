@@ -1,15 +1,17 @@
+import functools
 import os
 import time
 from datetime import timedelta
-import functools
+
 from flask import Flask
 from flask import (
     flash, g, redirect, render_template, request, session, url_for
 )
-from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash, generate_password_hash
-from bdpf.service import checkservice, Grouping
+from werkzeug.utils import secure_filename
+
 import db
+from bdpf.service import CheckService, CheckAlgorithm
 from db import get_db
 
 app = Flask(__name__)
@@ -139,10 +141,10 @@ def api_upload():
         f.save(os.path.join(file_dir, new_filename))
         f_path = file_dir + '/' + new_filename
         print(f_path)
-        res_list = checkservice.upload_check(f_path)
+        res_list = CheckService.upload_check(f_path)
         # 将查重结果的list进行分类，入参一个list，返回含有三个list的数组。
         # 将分类后的查重结果进行展示。
-        arr = Grouping.GenGroup(res_list)
+        arr: tuple = CheckAlgorithm.table_group(res_list)
         # return render_template('result.html', match=arr[0], unmatch=arr[1], maybe=arr[2])
         match_list = arr[1]
         match_list.extend(arr[2])
