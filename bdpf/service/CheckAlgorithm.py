@@ -1,16 +1,47 @@
 # -*- coding:utf-8 -*-
-import random
+from typing import List
 
+from similarity.jarowinkler import JaroWinkler
+
+from bdpf.model.RepeatInfo import RepeatInfo
 from bdpf.model.TableInfo import TableInfo
 
 
 # 查重算法
-def check_repeat(table_info: TableInfo, target_list: list):
-    i = random.randint(0, 2)
-    table_info.result = i
-    print("type is ")
-    print(type(target_list))
+def check_repeat(table_info: TableInfo, target_list: List, target_tag):
+    jk = JaroWinkler()
+    similar_list: List[RepeatInfo] = list()
+    for t_name in target_list:
+        similar_point = jk.similarity(t_name, table_info.t_name)
+        restore_result(t_name, similar_point, similar_list)
+    # 处理查询后的结果
+    similar_msg_list = list()
+    similar_result = 0
+    for repeat_info in similar_list:
+        if repeat_info.similar_point > 0.97:
+            similar_result = 1
+            similar_msg_list.append('与' + repeat_info.t_name + '('+target_tag+')完全重复')
+        elif repeat_info.similar_point > 0.5:
+            similar_result = similar_result if similar_result == 1 else 2
+            similar_msg_list.append('与' + repeat_info.t_name + '('+target_tag+')疑似重复')
+
+    table_info.result = similar_result
+    table_info.msg = similar_msg_list
     return table_info
+
+
+def restore_result(t_name, similar_point, similar_list: List[RepeatInfo]):
+    similar_size = 3
+    # 相似列表未存满，同时相似度大于0。存入相似列表
+    if len(similar_list) < similar_size and similar_point > 0:
+        similar_list.append(RepeatInfo(t_name, similar_point))
+    else:
+        for repeat_info in similar_list:
+            if similar_point > repeat_info.similar_point:
+                repeat_info.similar_point = similar_point
+                repeat_info.t_name = t_name
+                break
+    print(type(similar_list))
 
 
 # 结果分类

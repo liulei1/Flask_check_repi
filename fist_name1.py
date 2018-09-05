@@ -29,7 +29,7 @@ ALLOWED_EXTENSIONS = set(['xlsx'])
 db.init_app(app)
 
 
-@app.route('/', methods=('GET', 'POST'))
+@app.route('/login', methods=('GET', 'POST'))
 def login():
     session.clear()
     if request.method == 'POST':
@@ -48,15 +48,12 @@ def login():
             error = '用户名错误！'
         elif not check_password_hash(user['password'], password):
             error = '密码错误！'
-
         if error is None:
             # store the user id in a new session and return to the index
             session.clear()
             session['user_id'] = user['id']
             return redirect(url_for('index_page'))
-
         flash(error)
-
     return render_template('login.html')
 
 
@@ -65,16 +62,13 @@ def login_required(view):
     def wrapped_view(**kwargs):
         if g.user is None:
             return redirect(url_for('login'))
-
         return view(**kwargs)
-
     return wrapped_view
 
 
 @app.before_request
 def load_logged_in_user():
     user_id = session.get('user_id')
-
     if user_id is None:
         g.user = None
     else:
@@ -90,7 +84,6 @@ def register():
         password = request.form['password']
         db = get_db()
         error = None
-
         if not username:
             error = '请输入用户名！'
         elif not password:
@@ -99,7 +92,6 @@ def register():
             'SELECT id FROM user WHERE username = ?', (username,)
         ).fetchone() is not None:
             error = '用户 {0} 已存在！'.format(username)
-
         if error is None:
             # the name is available, store it in the database and go to
             # the login page
@@ -109,9 +101,7 @@ def register():
             )
             db.commit()
             return redirect(url_for('login'))
-
         flash(error)
-
     return render_template('register.html')
 
 
@@ -121,9 +111,9 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/index', methods=['GET'], strict_slashes=False)
+@app.route('/to_upload', methods=['GET'], strict_slashes=False)
 def index_page():
-    return render_template('index.html')
+    return render_template('file_upload.html')
 
 
 @app.route('/file_upload', methods=['POST'], strict_slashes=False)
@@ -132,7 +122,6 @@ def api_upload():
     if not os.path.exists(file_dir):
         os.makedirs(file_dir)
     f = request.files['file']
-
     if f and allowed_file(f.filename):
         fname = secure_filename(f.filename)
         ext = fname.rsplit('.', 1)[1]
