@@ -11,7 +11,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
 import db
-from bdpf.service import CheckService, CheckAlgorithm
+from bdpf.service import CheckService, CheckAlgorithm, ReceivedService
 from db import get_db
 
 app = Flask(__name__)
@@ -55,15 +55,6 @@ def login():
             return redirect(url_for('index_page'))
         flash(error)
     return render_template('login.html')
-
-
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('login'))
-        return view(**kwargs)
-    return wrapped_view
 
 
 @app.before_request
@@ -141,6 +132,21 @@ def api_upload():
         # return "上传成功"
     else:
         return "上传文件失败"
+
+
+@app.route('/show_received', methods=['GET', 'POST'], strict_slashes=False)
+def show_received():
+    received_list = ReceivedService.query_received_table()
+    return render_template('received.html', received_list=received_list)
+
+
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            return redirect(url_for('login'))
+        return view(**kwargs)
+    return wrapped_view
 
 
 def allowed_file(filename):
