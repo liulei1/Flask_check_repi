@@ -11,9 +11,9 @@ def upload_check(file_path):
     # 获取已上线的表名，返回list。
     # 获取已受理的表名，返回list。
     # 将解析的list进行查重，返回带有查重结果的list。入参两个list，返回一个list。
-    Dao.select_received()
+    Dao.select_received_name()
     table_list: List[TableInfo] = FileRead.read_excel(file_path)
-    target_list = Dao.select_received()
+    target_list = Dao.select_received_name()
     for t in table_list:
         CheckAlgorithm.check_repeat(t, target_list, '已受理')
     return table_list
