@@ -1,4 +1,5 @@
 import functools
+import json
 import os
 import time
 from datetime import timedelta
@@ -80,7 +81,7 @@ def register():
         elif not password:
             error = '请输入密码！'
         elif db.execute(
-            'SELECT id FROM user WHERE username = ?', (username,)
+                'SELECT id FROM user WHERE username = ?', (username,)
         ).fetchone() is not None:
             error = '用户 {0} 已存在！'.format(username)
         if error is None:
@@ -140,12 +141,23 @@ def show_received():
     return render_template('received.html', received_list=received_list)
 
 
+@app.route('/user_submit', methods=['GET', 'POST'], strict_slashes=False)
+def user_submit():
+    json_str = request.form.get("submit_json")
+    json_data = json.loads(json_str)
+    print(json_data)
+    json_list = json_data["arr"]
+    res = ReceivedService.receive_submit(json_list)
+    return res
+
+
 def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
             return redirect(url_for('login'))
         return view(**kwargs)
+
     return wrapped_view
 
 

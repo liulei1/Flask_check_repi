@@ -41,7 +41,7 @@ def restore_result(t_name, similar_point, similar_list: List[RepeatInfo]):
                 repeat_info.similar_point = similar_point
                 repeat_info.t_name = t_name
                 break
-    print(type(similar_list))
+    # print(type(similar_list))
 
 
 # 结果分类
