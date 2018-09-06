@@ -53,6 +53,7 @@ def login():
             # store the user id in a new session and return to the index
             session.clear()
             session['user_id'] = user['id']
+            session['user_name'] = user['username']
             return redirect(url_for("index_page"))
         flash(error)
     return render_template('login.html')
@@ -147,7 +148,8 @@ def user_submit():
     json_data = json.loads(json_str)
     print(json_data)
     json_list = json_data["arr"]
-    res = ReceivedService.receive_submit(json_list)
+    user_name = session.get("user_name")
+    res = ReceivedService.receive_submit(json_list, user_name)
     return res
 
 
@@ -165,7 +167,6 @@ def login_required(view):
         if g.user is None:
             return redirect(url_for('login'))
         return view(**kwargs)
-
     return wrapped_view
 
 
