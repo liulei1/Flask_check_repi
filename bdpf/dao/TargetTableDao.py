@@ -77,7 +77,7 @@ def select_received(t_name="", t_cname=""):
         sql_param += " and t_name like '%" + t_name + "%'"
     if t_cname != "":
         sql_param += " and t_cname like '%" + t_cname + "%'"
-    sql = sql + sql_param
+    sql = sql + sql_param + " order by submit_date desc"
     cp = configparser.ConfigParser()
     path = os.path.split(os.path.realpath(__file__))[0]
     cp.read(path + "/config.cfg")
