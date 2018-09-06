@@ -21,7 +21,9 @@ def check_repeat(table_info: TableInfo, target_list: List, target_tag: str) -> T
         if repeat_info.similar_point > 0.97:
             similar_result = 1
             similar_msg_list.append('与' + repeat_info.t_name + '('+target_tag+')完全重复')
-        elif repeat_info.similar_point > 0.5:
+            # 完全重复就不需要在查找疑似重复
+            break
+        elif repeat_info.similar_point > 0.6:
             similar_result = similar_result if similar_result == 1 else 2
             similar_msg_list.append('与' + repeat_info.t_name + '('+target_tag+')疑似重复')
 
