@@ -9,6 +9,10 @@ from bdpf.model.TableInfo import TableInfo
 
 # 查重算法
 def check_repeat(table_info: TableInfo, target_list: List, target_tag: str) -> TableInfo:
+    # 已重复，直接跳出
+    if table_info.result == 1:
+        return table_info
+
     jk = JaroWinkler()
     similar_list: List[RepeatInfo] = list()
     for t_name in target_list:

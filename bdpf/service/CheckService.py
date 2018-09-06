@@ -16,5 +16,9 @@ def upload_check(file_path):
     target_list = Dao.select_received_name()
     for t in table_list:
         CheckAlgorithm.check_repeat(t, target_list, '已受理')
+
+    processed_list = Dao.select_processed_name()
+    for t in table_list:
+        CheckAlgorithm.check_repeat(t, processed_list, '已上线')
     return table_list
 
