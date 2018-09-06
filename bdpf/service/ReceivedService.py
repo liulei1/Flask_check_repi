@@ -5,8 +5,13 @@ from typing import List
 from bdpf.dao import TargetTableDao as Dao, TargetTableDao
 
 
-def query_received_table():
-    received_list = Dao.select_received()
+# def query_received_table():
+#     received_list = Dao.select_received()
+#     return received_list
+
+
+def query_received_table(t_name="", t_cname=""):
+    received_list = Dao.select_received(t_name, t_cname)
     return received_list
 
 

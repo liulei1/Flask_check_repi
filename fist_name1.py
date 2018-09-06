@@ -53,7 +53,7 @@ def login():
             # store the user id in a new session and return to the index
             session.clear()
             session['user_id'] = user['id']
-            return redirect(url_for('index_page'))
+            return redirect(url_for("index_page"))
         flash(error)
     return render_template('login.html')
 
@@ -149,6 +149,14 @@ def user_submit():
     json_list = json_data["arr"]
     res = ReceivedService.receive_submit(json_list)
     return res
+
+
+@app.route('/received_query', methods=['POST'], strict_slashes=False)
+def received_query():
+    t_name = request.form['t_name']
+    t_cname = request.form['t_cname']
+    received_list = ReceivedService.query_received_table(t_name, t_cname)
+    return render_template('received.html', received_list=received_list)
 
 
 def login_required(view):
