@@ -8,7 +8,7 @@ from bdpf.model.TableInfo import TableInfo
 
 
 # 查重算法
-def check_repeat(table_info: TableInfo, target_list: List, target_tag):
+def check_repeat(table_info: TableInfo, target_list: List, target_tag: str) -> TableInfo:
     jk = JaroWinkler()
     similar_list: List[RepeatInfo] = list()
     for t_name in target_list:
@@ -41,7 +41,7 @@ def restore_result(t_name, similar_point, similar_list: List[RepeatInfo]):
                 repeat_info.similar_point = similar_point
                 repeat_info.t_name = t_name
                 break
-    print(type(similar_list))
+    # print(type(similar_list))
 
 
 # 结果分类

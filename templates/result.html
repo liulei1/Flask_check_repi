@@ -5,7 +5,9 @@
     <table class="table table-striped table-bordered table-hover table-condensed">
         <thead>
         <tr>
-            <th class="table_center" style="width:30%">表名</th>
+            <th class="table_center" style="width:15%">表名</th>
+            <th class="table_center" style="width:15%">中文名</th>
+            <th class="table_center" style="width:10%">来源</th>
             <th class="table_center" style="width:10%">查重结果</th>
             <th class="table_center">查重信息</th>
         </tr>
@@ -13,15 +15,22 @@
         <tbody>
         {% for item in match%}
         <tr>
-            <td class="table_center">
+            <td class="table_center t_name">
                 {{item.t_name}}
+            </td>
+            <td class="table_center t_cname">
+                {{item.t_cname}}
+            </td>
+            </td>
+            <td class="table_center src_system">
+                {{item.src_system}}
             </td>
             <td class="table_center" style="color:red">
                 {{item.result}}
             </td>
             <td style="vertical-align: middle !important;padding-left:1rem">
                 {% for msg in item.msg%}
-                    {{msg}}<br>
+                {{msg}}<br>
                 {% endfor %}
             </td>
         </tr>
@@ -30,37 +39,16 @@
     </table>
 </div>
 
-<!--<div style="width:60%;margin-left:20%">-->
-<!--<table class="table table-striped table-bordered table-hover table-condensed">-->
-<!--<thead>-->
-<!--<tr>-->
-<!--<th>表名</th>-->
-<!--<th>查重结果</th>-->
-<!--</tr>-->
-<!--</thead>-->
-<!--<tbody>-->
-<!--{% for item in maybe%}-->
-<!--<tr>-->
-<!--<td>-->
-<!--{{item.t_name}}-->
-<!--</td>-->
-<!--<td>-->
-<!--{{item.result}}-->
-<!--</td>-->
-<!--</tr>-->
-<!--{% endfor %}-->
-<!--</tbody>-->
-<!--</table>-->
-<!--</div>-->
-
 <hr style="height:5px;border:none;border-top:2px ridge #5cb85c;width:70%">
 
 <div style="width:60%;margin-left:20%;margin-top:3rem;">
-    <table class="table table-striped table-bordered table-hover">
+    <table class="table table-striped table-bordered table-hover" id="submit_form">
         <thead>
         {% if unmatch|length>0 %}
         <tr>
-            <th class="table_center" style="width:30%">表名</th>
+            <th class="table_center" style="width:15%">表名</th>
+            <th class="table_center" style="width:15%">中文名</th>
+            <th class="table_center" style="width:10%">来源</th>
             <th class="table_center" style="width:10%">查重结果</th>
             <th class="table_center">查重信息</th>
         </tr>
@@ -69,15 +57,22 @@
         <tbody>
         {% for item in unmatch%}
         <tr>
-            <td class="table_center">
+            <td class="table_center t_name">
                 {{item.t_name}}
+            </td>
+            <td class="table_center t_cname">
+                {{item.t_cname}}
+            </td>
+            </td>
+            <td class="table_center src_system">
+                {{item.src_system}}
             </td>
             <td class="table_center" style="color:green">
                 {{item.result}}
             </td>
             <td style="vertical-align: middle !important;padding-left:1rem">
                 {% for msg in item.msg%}
-                    {{msg}}<br>
+                {{msg}}<br>
                 {% endfor %}
             </td>
         </tr>
@@ -87,19 +82,56 @@
     {% if unmatch|length>0 %}
     <button class="btn btn-success" style="margin-right:5rem" onclick="form_submit()">提交申请</button>
     {% endif %}
-    <button class="btn btn-info" onclick="location='/file_upload'">重新上传</button>
+    <button class="btn btn-info" onclick="location='/to_upload'">重新上传</button>
 </div>
 <script>
     function form_submit(){
         if(confirm("确认提交？")){
-            window.location.href='/'
+            var arr = new Array();
+            $("#submit_form tr").each(function(i){
+                var t_name = $.trim($(this).children('.t_name').text());
+                var t_cname = $.trim($(this).children('.t_cname').text());
+                var src_system = $.trim($(this).children('.src_system').text());
+                if(t_name != "" && t_name != null){
+                    <!--var t = new table(t_name, t_cname, src_system);-->
+                    <!--var t = t_name+"&"+t_cname+"&"+src_system;-->
+                    <!--var t = new Array(t_name, t_cname, src_system);-->
+                    var t = table_json(t_name, t_cname, src_system);
+                    arr.push(t)
+                }
+            });
+            var json = {"arr":arr};
+            var json_data = JSON.stringify(json) ;
+            $.post("/user_submit",{"submit_json":json_data},function(data){
+                if(data == "success"){
+                    alert("提交成功");
+                    window.location.href="/to_upload"
+                }else {
+                    alert("提交失败:"+data);
+                    window.location.reload();
+                }
+            });
         }
     }
+
+    function table(t_name, t_cname, src_system){
+        this.t_name=t_name;
+        this.t_cname=t_cname;
+        this.src_system=src_system;
+    }
+
+    function table_json(t_name, t_cname, src_system){
+        var json_data='{"t_name":"'+t_name+'","t_cname":"'+t_cname+'","src_system":"'+src_system+'"}';
+        return json_data;
+    }
+
 </script>
 <style>
     .table_center {
         vertical-align: middle !important;
         text-align: center;
     }
+
+
 </style>
 {% endblock %}
