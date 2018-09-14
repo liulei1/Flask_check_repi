@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
 <h1 align="center">查重结果</h1>
-<div style="width:60%;margin-left:20%;margin-top:3rem;">
+<div style="width:80%;margin-left:10%;margin-top:3rem;">
     <table class="table table-striped table-bordered table-hover table-condensed">
         <thead>
         {% if match|length>0 %}
@@ -42,13 +42,13 @@
 </div>
 
 {% if unmatch|length>0 and match|length>0%}
-<hr style="height:5px;border:none;border-top:2px ridge #5cb85c;width:70%">
+<hr style="height:5px;border:none;border-top:2px ridge #5cb85c;width:90%">
 {% endif %}
 
-<div style="width:60%;margin-left:20%;margin-top:3rem;">
+<div style="width:80%;margin-left:10%;margin-top:3rem;">
     <table class="table table-striped table-bordered table-hover" id="submit_form">
         <thead>
-        {% if unmatch|length>0 and match|length>0 %}
+        {% if unmatch|length>0 %}
         <tr>
             <th class="table_center" style="width:15%">表名</th>
             <th class="table_center" style="width:15%">中文名</th>
