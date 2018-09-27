@@ -17,7 +17,7 @@ def read_excel(file_path):
     table_list = []
     try:
         data = open_excel(file_path)
-        table = data.sheet_by_name(u'需求申请表1')
+        table = data.sheet_by_name(u'需求申请表')
         nrows = table.nrows
         for rownum in range(2, nrows):
             row = table.row_values(rownum)

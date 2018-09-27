@@ -23,7 +23,7 @@ def upload_check(file_path):
             CheckAlgorithm.check_repeat(t, received_list, '已受理')
             CheckAlgorithm.check_repeat(t, processed_list, '已上线')
         else:  # 不存在
-            t.result = 3
+            t.result = 1
             t.msg = '来源系统不存在'
     return table_list
 

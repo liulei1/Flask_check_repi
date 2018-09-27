@@ -109,6 +109,7 @@ def index_page():
     return render_template('file_upload.html')
 
 
+# 用户申请-文件上传
 @app.route('/file_upload', methods=['POST'], strict_slashes=False)
 def api_upload():
     file_dir = os.path.join(basedir, app.config['UPLOAD_FOLDER'])
@@ -142,6 +143,7 @@ def show_received():
     return render_template('received.html', received_list=received_list)
 
 
+# 用户查重提交-不重复表
 @app.route('/user_submit', methods=['GET', 'POST'], strict_slashes=False)
 def user_submit():
     json_str = request.form.get("submit_json")

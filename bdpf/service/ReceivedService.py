@@ -15,8 +15,10 @@ def query_received_table(t_name="", t_cname=""):
     return received_list
 
 
+# 存储已受理表信息
 def receive_submit(json_list: List, user_name):
-    sql_pre = "insert into etl_check.received_table (t_name,t_cname,src_system,submit_date,user_name) values "
+    sql_pre = "insert into etl_check.received_table (t_name,t_cname,src_system,submit_date,user_name,received_state) " \
+              "values "
     sql_param = ""
     for t_json in json_list:
         print(t_json)
@@ -25,12 +27,11 @@ def receive_submit(json_list: List, user_name):
         t_cname = t_dict["t_cname"]
         src_system = t_dict["src_system"]
         submit_data = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        received_state = '0'
         sql_param += "('" + t_name + "','" + t_cname + "','" + src_system + "','" + submit_data + "','"\
-                     + user_name + "'),"
+                     + user_name + "','" + received_state + "'),"
     sql = sql_pre + sql_param[0:len(sql_param) - 1]
     print(sql)
-    count = TargetTableDao.execute_sql(sql)
-    if count > 0:
-        return "success"
-    else:
-        return "submit nothing"
+    TargetTableDao.execute_sql(sql)
+    return "success"
+
