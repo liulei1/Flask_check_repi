@@ -9,15 +9,7 @@ from bdpf.model.TableInfo import TableInfo
 
 
 def mysql_connect_select(sql):
-    cp = configparser.ConfigParser()
-    path = os.path.split(os.path.realpath(__file__))[0]
-    cp.read(path + "/config.cfg")
-    mysql_host = cp.get("MYSQL", "host")
-    # print(mysql_host)
-    mysql_username = cp.get("MYSQL", "username")
-    mysql_passwd = cp.get("MYSQL", "passwd")
-    mysql_database = cp.get("MYSQL", "database")
-    conn = pymysql.connect(mysql_host, mysql_username, mysql_passwd, mysql_database)
+    conn = get_mysql_connect()
     cur = conn.cursor()
     cur.execute(sql)
     data = cur.fetchall()
@@ -29,16 +21,16 @@ def mysql_connect_select(sql):
     return received_list
 
 
-# 返回已受理表名列表
-def select_received_name():
-    sql = "select t_name from received_table"
+# 根据来源系统返回已受理表名列表
+def select_received_name(src_system):
+    sql = "select distinct t_name from received_table where src_system = '" + src_system + "'"
     received_list = mysql_connect_select(sql)
     return received_list
 
 
-# 返回已上线表名列表
-def select_processed_name():
-    sql = "select t_name from processed_table"
+# 根据来源系统返回已上线表名列表
+def select_processed_name(src_system):
+    sql = "select distinct t_name from processed_table where src_system = '" + src_system + "'"
     received_list = mysql_connect_select(sql)
     return received_list
 
@@ -78,14 +70,15 @@ def select_received(t_name="", t_cname=""):
     if t_cname != "":
         sql_param += " and t_cname like '%" + t_cname + "%'"
     sql = sql + sql_param + " order by submit_date desc"
-    cp = configparser.ConfigParser()
-    path = os.path.split(os.path.realpath(__file__))[0]
-    cp.read(path + "/config.cfg")
-    mysql_host = cp.get("MYSQL", "host")
-    mysql_username = cp.get("MYSQL", "username")
-    mysql_passwd = cp.get("MYSQL", "passwd")
-    mysql_database = cp.get("MYSQL", "database")
-    conn = pymysql.connect(mysql_host, mysql_username, mysql_passwd, mysql_database)
+    # cp = configparser.ConfigParser()
+    # path = os.path.split(os.path.realpath(__file__))[0]
+    # cp.read(path + "/config.cfg")
+    # mysql_host = cp.get("MYSQL", "host")
+    # mysql_username = cp.get("MYSQL", "username")
+    # mysql_passwd = cp.get("MYSQL", "passwd")
+    # mysql_database = cp.get("MYSQL", "database")
+    # conn = pymysql.connect(mysql_host, mysql_username, mysql_passwd, mysql_database)
+    conn = get_mysql_connect()
     cur = conn.cursor()
     cur.execute(sql)
     data = cur.fetchall()
@@ -104,19 +97,51 @@ def select_received(t_name="", t_cname=""):
 
 
 def execute_sql(sql):
-    cp = configparser.ConfigParser()
-    path = os.path.split(os.path.realpath(__file__))[0]
-    cp.read(path + "/config.cfg")
-    # 获取mysql信息
-    mysql_host = cp.get("MYSQL", "host")
-    mysql_username = cp.get("MYSQL", "username")
-    mysql_passwd = cp.get("MYSQL", "passwd")
-    mysql_database = cp.get("MYSQL", "database")
-    # 查询
-    conn = pymysql.connect(mysql_host, mysql_username, mysql_passwd, mysql_database)
+    # cp = configparser.ConfigParser()
+    # path = os.path.split(os.path.realpath(__file__))[0]
+    # cp.read(path + "/config.cfg")
+    # # 获取mysql信息
+    # mysql_host = cp.get("MYSQL", "host")
+    # mysql_username = cp.get("MYSQL", "username")
+    # mysql_passwd = cp.get("MYSQL", "passwd")
+    # mysql_database = cp.get("MYSQL", "database")
+    # # 查询
+    # conn = pymysql.connect(mysql_host, mysql_username, mysql_passwd, mysql_database)
+    conn = get_mysql_connect()
     cur = conn.cursor()
-    count = cur.execute(sql)
+    cur.execute(sql)
+    data: tuple = cur.fetchall()
+    conn.commit()
+    cur.close()
+    conn.close()
+    return data
+
+
+# 根据来源系统返回已受理表名列表
+def select_src_system(src_system):
+    sql = "select count(*) from src_system where app_short = '"+src_system+"'"
+    print(sql)
+    conn = get_mysql_connect()
+    cur = conn.cursor()
+    cur.execute(sql)
+    data = cur.fetchone()
+    count = data[0]
     conn.commit()
     cur.close()
     conn.close()
     return count
+
+
+# 获取mysql连接
+def get_mysql_connect():
+    cp = configparser.ConfigParser()
+    path = os.path.split(os.path.realpath(__file__))[0]
+    cp.read(path + "/config.cfg")
+    mysql_host = cp.get("MYSQL", "host")
+    # print(mysql_host)
+    mysql_username = cp.get("MYSQL", "username")
+    mysql_passwd = cp.get("MYSQL", "passwd")
+    mysql_database = cp.get("MYSQL", "database")
+    conn = pymysql.connect(mysql_host, mysql_username, mysql_passwd, mysql_database)
+    return conn
+

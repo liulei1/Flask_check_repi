@@ -11,14 +11,19 @@ def upload_check(file_path):
     # 获取已上线的表名，返回list。
     # 获取已受理的表名，返回list。
     # 将解析的list进行查重，返回带有查重结果的list。入参两个list，返回一个list。
-    Dao.select_received_name()
     table_list: List[TableInfo] = FileRead.read_excel(file_path)
-    target_list = Dao.select_received_name()
+    # 循环对上传的表进行查重
     for t in table_list:
-        CheckAlgorithm.check_repeat(t, target_list, '已受理')
-
-    processed_list = Dao.select_processed_name()
-    for t in table_list:
-        CheckAlgorithm.check_repeat(t, processed_list, '已上线')
+        # 检查来源系统是否存在
+        src_count = Dao.select_src_system(t.src_system)
+        if src_count > 0:  # 存在
+            Dao.select_processed_name(t.src_system)
+            received_list = Dao.select_received_name(t.src_system)
+            processed_list = Dao.select_processed_name(t.src_system)
+            CheckAlgorithm.check_repeat(t, received_list, '已受理')
+            CheckAlgorithm.check_repeat(t, processed_list, '已上线')
+        else:  # 不存在
+            t.result = 3
+            t.msg = '来源系统不存在'
     return table_list
 
