@@ -23,7 +23,10 @@ def read_excel(file_path):
         for rownum in range(2, nrows):
             row = table.row_values(rownum)
             if row:
-                t = TableInfo(row[3], row[4], row[2], '0', '')
+                t_name = row[3].strip()
+                t_cname = row[4].strip()
+                src_system = row[2].strip()
+                t = TableInfo(t_name, t_cname, src_system, '0', '')
                 table_list.append(t)
         return table_list
     except XLRDError:
@@ -40,11 +43,14 @@ def read_excel_update(file_path):
         for rownum in range(1, nrows):
             row = table.row_values(rownum)
             if row:
-                if row[1] != "" and row[2] != "" and row[3] != "":
+                t_name = row[1].strip()
+                t_cname = row[2].strip()
+                src_system = row[3].strip()
+                if t_name != "" and t_cname != "" and src_system != "":
                     # 表名 源系统 目标系统必填
-                    t = ProcessedInfo(row[1], row[2], row[3], 'update')
+                    t = ProcessedInfo(t_name, t_cname, src_system, 'update')
                 else:  # 信息不完整不做更新
-                    t = ProcessedInfo(row[1], row[2], row[3], 'error')
+                    t = ProcessedInfo(t_name, t_cname, src_system, 'error')
                     t.update_msg = "更新信息不完整"
                 table_list.append(t)
         return table_list
