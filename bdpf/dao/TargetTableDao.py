@@ -5,6 +5,7 @@ from typing import List
 import pymysql
 
 # 执行sql，返回查询结果
+from bdpf.model.ProcessedInfo import ProcessedInfo
 from bdpf.model.TableInfo import TableInfo
 
 
@@ -70,14 +71,7 @@ def select_received(t_name="", t_cname=""):
     if t_cname != "":
         sql_param += " and t_cname like '%" + t_cname + "%'"
     sql = sql + sql_param + " order by submit_date desc"
-    # cp = configparser.ConfigParser()
-    # path = os.path.split(os.path.realpath(__file__))[0]
-    # cp.read(path + "/config.cfg")
-    # mysql_host = cp.get("MYSQL", "host")
-    # mysql_username = cp.get("MYSQL", "username")
-    # mysql_passwd = cp.get("MYSQL", "passwd")
-    # mysql_database = cp.get("MYSQL", "database")
-    # conn = pymysql.connect(mysql_host, mysql_username, mysql_passwd, mysql_database)
+
     conn = get_mysql_connect()
     cur = conn.cursor()
     cur.execute(sql)
@@ -109,7 +103,7 @@ def execute_sql(sql):
 
 # 根据来源系统返回已受理表名列表
 def select_src_system(src_system):
-    sql = "select count(*) from src_system where app_short = '"+src_system+"'"
+    sql = "select count(*) from src_system where app_short = '" + src_system + "'"
     print(sql)
     conn = get_mysql_connect()
     cur = conn.cursor()
@@ -120,6 +114,32 @@ def select_src_system(src_system):
     cur.close()
     conn.close()
     return count
+
+
+# 插入新投产的表信息
+def received_to_processed(insert_list: List[ProcessedInfo]):
+    conn = get_mysql_connect()
+    cur = conn.cursor()
+    for t in insert_list:
+        # 对更新标志为update的表进行更新
+        if t.update_tag == 'update':
+            delete_sql = "delete from etl_check.received_table where t_name='" + t.t_name + "' and src_system='" \
+                  + t.src_system + "'"
+            insert_sql = "insert into etl_check.processed_table (t_name,src_system,des_system) values ('" + t.t_name \
+                         + "','" + t.src_system + "','"+ t.des_system +"')"
+            print(delete_sql)
+            cur.execute(delete_sql)
+            count = cur.rowcount
+            if count > 0:
+                print(insert_sql)
+                cur.execute(insert_sql)
+                t.update_tag = 'success'
+                conn.commit()
+            t.update_tag = "error"
+            t.update_msg = "already updated"
+    cur.close()
+    conn.close()
+    return insert_list
 
 
 # 获取mysql连接
@@ -134,4 +154,3 @@ def get_mysql_connect():
     mysql_database = cp.get("MYSQL", "database")
     conn = pymysql.connect(mysql_host, mysql_username, mysql_passwd, mysql_database)
     return conn
-

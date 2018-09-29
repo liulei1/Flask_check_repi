@@ -1,6 +1,7 @@
 from typing import List
 
 from bdpf.dao import TargetTableDao as Dao
+from bdpf.model.ProcessedInfo import ProcessedInfo
 from bdpf.model.TableInfo import TableInfo
 from bdpf.service import CheckAlgorithm, FileRead
 
@@ -27,3 +28,9 @@ def upload_check(file_path):
             t.msg = '来源系统不存在'
     return table_list
 
+
+def upload_update(file_path):
+    table_list: List[ProcessedInfo] = FileRead.read_excel_update(file_path)
+    # 插入到已上线表
+    Dao.received_to_processed(table_list)
+    return table_list

@@ -3,6 +3,7 @@ import json
 import os
 import time
 from datetime import timedelta
+from typing import List
 
 from flask import Flask
 from flask import (
@@ -12,6 +13,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
 import db
+from bdpf.model.ProcessedInfo import ProcessedInfo
 from bdpf.service import CheckService, CheckAlgorithm, ReceivedService
 from db import get_db
 
@@ -54,7 +56,7 @@ def login():
             session.clear()
             session['user_id'] = user['id']
             session['user_name'] = user['username']
-            return redirect(url_for("index_page"))
+            return redirect(url_for("home_page"))
         flash(error)
     return render_template('login.html')
 
@@ -104,9 +106,19 @@ def logout():
     return redirect(url_for('login'))
 
 
+@app.route('/home_page', methods=['GET'], strict_slashes=False)
+def home_page():
+    return render_template('home.html')
+
+
 @app.route('/to_upload', methods=['GET'], strict_slashes=False)
 def index_page():
     return render_template('file_upload.html')
+
+
+@app.route('/to_update', methods=['GET'], strict_slashes=False)
+def update_page():
+    return render_template('update_upload.html')
 
 
 # 用户申请-文件上传
@@ -180,6 +192,27 @@ def get_session():
     new_filename = session.get('new_filename')
     print(new_filename)
     return new_filename or u'no session'
+
+
+# 用户申请-文件上传
+@app.route('/update_received', methods=['POST'], strict_slashes=False)
+def update_received():
+    file_dir = os.path.join(basedir, app.config['UPLOAD_FOLDER'])
+    if not os.path.exists(file_dir):
+        os.makedirs(file_dir)
+    f = request.files['file']
+    if f and allowed_file(f.filename):
+        fname = secure_filename(f.filename)
+        ext = fname.rsplit('.', 1)[1]
+        unix_time = int(time.time())
+        new_filename = str(unix_time) + '.' + ext
+        f.save(os.path.join(file_dir, new_filename))
+        f_path = file_dir + '/' + new_filename
+        print(f_path)
+        updated_list: List[ProcessedInfo] = CheckService.upload_update(f_path)
+        return render_template('update_result.html', updated_list=updated_list)
+    else:
+        return "上传文件失败"
 
 
 if __name__ == '__main__':

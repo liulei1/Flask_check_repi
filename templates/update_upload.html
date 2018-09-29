@@ -1,13 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
 <div align="center">
-    <h2>申请表上传(只支持.xlsx)</h2>
+    <h2>更新表上传(只支持.xlsx)</h2>
     <div style="padding-left: 34%">
-        <form action="/file_upload" enctype="multipart/form-data" method="post">
+        <form action="/update_received" enctype="multipart/form-data" method="post">
             <input type="file" style="margin-top:1.5rem;" name="file" accept="application/msexcel">
             <div style="text-align:left;">
                 <input type="submit" style="margin-top:1.4rem;margin-right:4rem;min-width:7rem" class="btn btn-success" value="上传">
-
             </div>
         </form>
     </div>
