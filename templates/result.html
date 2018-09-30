@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block body %}
 <h1 align="center">查重结果</h1>
-<div style="width:80%;margin-left:10%;margin-top:3rem;">
+<div style="width:90%;margin-left:5%;margin-top:3rem;">
     <table class="table table-striped table-bordered table-hover table-condensed">
         <thead>
         {% if match|length>0 %}
         <tr>
-            <th class="table_center" style="width:5%">表名</th>
+            <th class="table_center" style="width:5%">#</th>
             <th class="table_center" style="width:15%">表名</th>
             <th class="table_center" style="width:15%">中文名</th>
             <th class="table_center" style="width:10%">来源</th>
@@ -18,6 +18,9 @@
         <tbody>
         {% for item in match%}
         <tr>
+            <td class="table_center">
+                {{ loop.index }}
+            </td>
             <td class="table_center t_name">
                 {{item.t_name}}
             </td>
@@ -49,17 +52,20 @@
         <thead>
         {% if unmatch|length>0 %}
         <tr>
+            <th class="table_center" style="width:5%">#</th>
             <th class="table_center" style="width:15%">表名</th>
             <th class="table_center" style="width:15%">中文名</th>
             <th class="table_center" style="width:10%">来源</th>
             <th class="table_center" style="width:10%">查重结果</th>
-            <th class="table_center">查重信息</th>
         </tr>
         {% endif %}
         </thead>
         <tbody>
         {% for item in unmatch%}
         <tr>
+            <td class="table_center">
+                {{ loop.index }}
+            </td>
             <td class="table_center t_name">
                 {{item.t_name}}
             </td>
@@ -72,11 +78,6 @@
             </td>
             <td class="table_center" style="color:green">
                 {{item.result}}
-            </td>
-            <td style="vertical-align: middle !important;padding-left:1rem">
-                {% for msg in item.msg%}
-                {{msg}}<br>
-                {% endfor %}
             </td>
         </tr>
         {% endfor %}

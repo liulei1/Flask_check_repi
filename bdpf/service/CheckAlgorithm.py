@@ -16,9 +16,13 @@ def check_repeat(table_info: TableInfo, target_list: List, target_tag: str) -> T
     # 初始化为不重复
     table_info.result = 0
     table_info.msg = ''
-    for t_name in target_list:
+    if target_tag == "已上线":
+        table_name = table_info.src_system + "_" + table_info.t_name
+    else:  # 已受理
         # 拼接来源系统和表名
-        table_name = table_info.src_system+"_" + table_info.t_name
+        table_name = table_info.t_name
+
+    for t_name in target_list:
         if t_name.lower() == table_name.lower():
             table_info.result = 1
             table_info.msg = '与' + t_name + '('+target_tag+')完全重复'
