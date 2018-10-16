@@ -5,16 +5,19 @@ import time
 from datetime import timedelta
 from typing import List
 
-from flask import Flask
+from apscheduler.schedulers.background import BackgroundScheduler
+from flask import Flask, make_response, send_from_directory, Response
 from flask import (
     flash, g, redirect, render_template, request, session, url_for
 )
+from flask.json import jsonify
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
 import db
+from bdpf.dao import ETLProcess
 from bdpf.model.ProcessedInfo import ProcessedInfo
-from bdpf.service import CheckService, CheckAlgorithm, ReceivedService
+from bdpf.service import CheckService, CheckAlgorithm, ReceivedService, MetaDataService
 from db import get_db
 
 app = Flask(__name__)
@@ -32,6 +35,20 @@ ALLOWED_EXTENSIONS = set(['xlsx'])
 db.init_app(app)
 
 
+# 拦截请求-用户未登录跳转至登陆界面
+# @app.before_request
+# def load_logged_in_user():
+#     if not request.path == '/login' and not request.path == '/to_login' and not request.path.startswith("/static"):
+#         user_id = session.get('user_id')
+#         if user_id is None:
+#             return redirect(url_for("login_page"))
+#         else:
+#             g.user = get_db().execute(
+#                 'SELECT * FROM user WHERE id = ?', (user_id,)
+#             ).fetchone()
+
+
+# 用户登陆
 @app.route('/login', methods=('GET', 'POST'))
 def login():
     session.clear()
@@ -61,17 +78,7 @@ def login():
     return render_template('login.html')
 
 
-@app.before_request
-def load_logged_in_user():
-    user_id = session.get('user_id')
-    if user_id is None:
-        g.user = None
-    else:
-        g.user = get_db().execute(
-            'SELECT * FROM user WHERE id = ?', (user_id,)
-        ).fetchone()
-
-
+# 用户注册
 @app.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
@@ -106,9 +113,15 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/home_page', methods=['GET'], strict_slashes=False)
+@app.route('/home_page', methods=['GET', 'POST'], strict_slashes=False)
 def home_page():
     return render_template('home.html')
+
+
+@app.route('/to_login', methods=['GET', 'POST'], strict_slashes=False)
+def login_page():
+    session.clear()
+    return render_template('login.html')
 
 
 @app.route('/to_upload', methods=['GET'], strict_slashes=False)
@@ -149,13 +162,14 @@ def api_upload():
         return "上传文件失败"
 
 
+# 已受理查看
 @app.route('/show_received', methods=['GET', 'POST'], strict_slashes=False)
 def show_received():
     received_list = ReceivedService.query_received_table()
     return render_template('received.html', received_list=received_list)
 
 
-# 用户查重提交-不重复表
+# 查重提交-不重复表
 @app.route('/user_submit', methods=['GET', 'POST'], strict_slashes=False)
 def user_submit():
     json_str = request.form.get("submit_json")
@@ -167,6 +181,7 @@ def user_submit():
     return res
 
 
+# 条件查询已受理
 @app.route('/received_query', methods=['POST'], strict_slashes=False)
 def received_query():
     t_name = request.form['t_name']
@@ -181,9 +196,11 @@ def login_required(view):
         if g.user is None:
             return redirect(url_for('login'))
         return view(**kwargs)
+
     return wrapped_view
 
 
+# 允许上传的文件后缀
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
@@ -194,7 +211,7 @@ def get_session():
     return new_filename or u'no session'
 
 
-# 用户申请-文件上传
+# 更新已受理信息
 @app.route('/update_received', methods=['POST'], strict_slashes=False)
 def update_received():
     file_dir = os.path.join(basedir, app.config['UPLOAD_FOLDER'])
@@ -215,7 +232,52 @@ def update_received():
         return "上传文件失败"
 
 
+# 文件下载
+@app.route('/download/<path:filename>')
+def download_file(filename):
+    # directory = os.getcwd()
+    directory = os.path.join(app.root_path, 'static')
+    # as_attachment表示下载
+    response: Response = make_response(send_from_directory(directory, filename, as_attachment=True))
+    print(type(response))
+    response.headers["Content-Disposition"] = "attachment;filename={}".format(filename)
+    return response
+
+
+# 生成元数据
+@app.route('/generate_metadata', methods=['GET', 'POST'])
+def generate_metadata():
+    print("generate_metadata..........")
+    # need_generate_count, generate_count, generate_list = ETLProcess.generate_etl_data()
+    need_generate_count, generate_count, generate_list = MetaDataService.generate_meta();
+    return render_template('meta_generate_result.html', need_generate_count=need_generate_count,
+                           generate_count=generate_count,
+                           generate_list=generate_list)
+
+
+# 生成元数据-json
+@app.route('/generate_metadata_json', methods=['GET', 'POST'])
+def generate_metadata_json():
+    print("generate_metadata..........")
+    need_generate_count, generate_count, generate_list = ETLProcess.generate_etl_data()
+    # res = ["200", need_generate_count, generate_count]
+    # return json.dumps(res)
+    return jsonify({'state': 200, 'need_generate_count': need_generate_count, 'generate_count': generate_count})
+
+
+def generate_meta_schedule():
+    print("generate meta ok ...")
+
+
 if __name__ == '__main__':
     # checkservice.upload_check('123')
     # app.run(host='0.0.0.0',port=8080)
+    # schedule.every(1).minutes.do(test_schedule)
+
+    # 定时执行元数据生成
+    scheduler = BackgroundScheduler()
+    # scheduler.add_job(test_schedule, 'cron', hour='0', minute='1', second='0')
+    scheduler.add_job(func=generate_meta_schedule, trigger='interval', minutes=1)
+    # 启动调度器，到点task就会被执行啦
+    scheduler.start()
     app.run(port=8080)

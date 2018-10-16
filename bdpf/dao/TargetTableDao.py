@@ -1,10 +1,7 @@
-import configparser
-import os
 from typing import List
 
-import pymysql
-
 # 执行sql，返回查询结果
+from bdpf.dao.ConnectDbUtils import get_mysql_connect
 from bdpf.model.ProcessedInfo import ProcessedInfo
 from bdpf.model.TableInfo import TableInfo
 
@@ -124,9 +121,9 @@ def received_to_processed(insert_list: List[ProcessedInfo]):
         # 对更新标志为update的表进行更新
         if t.update_tag == 'update':
             delete_sql = "delete from etl_check.received_table where t_name='" + t.t_name + "' and src_system='" \
-                  + t.src_system + "'"
+                         + t.src_system + "'"
             insert_sql = "insert into etl_check.processed_table (t_name,src_system,des_system) values ('" + t.t_name \
-                         + "','" + t.src_system + "','"+ t.des_system +"')"
+                         + "','" + t.src_system + "','" + t.des_system + "')"
             print(delete_sql)
             cur.execute(delete_sql)
             count = cur.rowcount
@@ -135,22 +132,23 @@ def received_to_processed(insert_list: List[ProcessedInfo]):
                 cur.execute(insert_sql)
                 t.update_tag = 'success'
                 conn.commit()
-            t.update_tag = "error"
-            t.update_msg = "already updated"
+            else:
+                t.update_tag = "error"
+                t.update_msg = "already updated"
     cur.close()
     conn.close()
     return insert_list
 
 
 # 获取mysql连接
-def get_mysql_connect():
-    cp = configparser.ConfigParser()
-    path = os.path.split(os.path.realpath(__file__))[0]
-    cp.read(path + "/config.cfg")
-    mysql_host = cp.get("MYSQL", "host")
-    # print(mysql_host)
-    mysql_username = cp.get("MYSQL", "username")
-    mysql_passwd = cp.get("MYSQL", "passwd")
-    mysql_database = cp.get("MYSQL", "database")
-    conn = pymysql.connect(mysql_host, mysql_username, mysql_passwd, mysql_database)
-    return conn
+# def get_mysql_connect():
+#     cp = configparser.ConfigParser()
+#     path = os.path.split(os.path.realpath(__file__))[0]
+#     cp.read(path + "/config.cfg")
+#     mysql_host = cp.get("MYSQL", "host")
+#     # print(mysql_host)
+#     mysql_username = cp.get("MYSQL", "username")
+#     mysql_passwd = cp.get("MYSQL", "passwd")
+#     mysql_database = cp.get("MYSQL", "database")
+#     conn = pymysql.connect(mysql_host, mysql_username, mysql_passwd, mysql_database)
+#     return conn

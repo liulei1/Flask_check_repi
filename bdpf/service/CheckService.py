@@ -3,7 +3,7 @@ from typing import List
 from bdpf.dao import TargetTableDao as Dao
 from bdpf.model.ProcessedInfo import ProcessedInfo
 from bdpf.model.TableInfo import TableInfo
-from bdpf.service import CheckAlgorithm, FileRead
+from bdpf.service import CheckAlgorithm, ExcelFileUtils
 
 
 def upload_check(file_path):
@@ -12,7 +12,7 @@ def upload_check(file_path):
     # 获取已上线的表名，返回list。
     # 获取已受理的表名，返回list。
     # 将解析的list进行查重，返回带有查重结果的list。入参两个list，返回一个list。
-    table_list: List[TableInfo] = FileRead.read_excel(file_path)
+    table_list: List[TableInfo] = ExcelFileUtils.read_excel(file_path)
     # 循环对上传的表进行查重
     for t in table_list:
         # 检查来源系统是否存在
@@ -30,7 +30,7 @@ def upload_check(file_path):
 
 
 def upload_update(file_path):
-    table_list: List[ProcessedInfo] = FileRead.read_excel_update(file_path)
+    table_list: List[ProcessedInfo] = ExcelFileUtils.read_excel_update(file_path)
     # 插入到已上线表
     Dao.received_to_processed(table_list)
     return table_list

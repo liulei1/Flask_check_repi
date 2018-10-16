@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-<h1 align="center">查重结果</h1>
+<h1 align="center">已受理信息</h1>
 <div style="width:80%;margin-left:10%;margin-top:3rem;">
     <div style="margin-bottom:2rem;height:4rem;">
         <form method="post" action="/received_query">
@@ -10,16 +10,19 @@
             </div>
             <div style="float:left;">
                 <input type="submit" class="btn btn-success" value="查询" style="margin:0 2rem;width:8rem;">
-                <a class="btn btn-info" style="width:8rem" href="/to_upload">查重上传</a>
+                <a class="btn btn-primary" style="margin-right:2rem;width:8rem" href="/to_upload">查重上传</a>
+                <!--<a href="javascript:history.back(-1)" style="min-width:7rem" class="btn btn-info">返回</a>-->
+                <a href="/home_page" style="min-width:7rem" class="btn btn-info">返回主页</a>
             </div>
         </form>
     </div>
     <table class="table table-striped table-bordered table-hover table-condensed">
         <thead>
         <tr style="background-color:#f6dcd8;">
+            <th class="table_center" style="width:5%">#</th>
             <th class="table_center" style="width:20%">表名</th>
             <th class="table_center" style="width:20%">中文名</th>
-            <th class="table_center" style="width:15%">申请人</th>
+            <th class="table_center" style="width:10%">申请人</th>
             <th class="table_center" style="width:15%">来源系统</th>
             <th class="table_center" style="width:30%">受理时间</th>
         </tr>
@@ -27,6 +30,9 @@
         <tbody>
         {% for item in received_list%}
         <tr>
+            <td class="table_center">
+                {{loop.index}}
+            </td>
             <td class="table_center">
                 {{item.t_name}}
             </td>

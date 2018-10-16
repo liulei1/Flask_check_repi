@@ -48,9 +48,9 @@ def read_excel_update(file_path):
                 src_system = row[3].strip()
                 if t_name != "" and t_cname != "" and src_system != "":
                     # 表名 源系统 目标系统必填
-                    t = ProcessedInfo(t_name, t_cname, src_system, 'update')
+                    t = ProcessedInfo(t_name, src_system, '', 'update', t_cname)
                 else:  # 信息不完整不做更新
-                    t = ProcessedInfo(t_name, t_cname, src_system, 'error')
+                    t = ProcessedInfo(t_name, src_system, '', 'error', t_cname)
                     t.update_msg = "更新信息不完整"
                 table_list.append(t)
         return table_list

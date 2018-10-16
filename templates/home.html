@@ -5,5 +5,17 @@
     <a class="btn btn-info" href="/to_upload">用户申请</a>
     <a class="btn btn-info" href="/to_update">更新受理</a>
     <a class="btn btn-info" href="/show_received">已受理</a>
+    <a class="btn btn-info" href="/generate_metadata">生成元数据</a>
+    <a class="btn btn-info" href="javascript:void(0)">生成调度表</a>
+    <!--<a id="generate_metadata" class="btn btn-info" href="javascript:void(0)">生成元数据</a>-->
 </div>
+<script>
+    $(document).ready(function () {
+        $("#generate_metadata").click(function () {
+            $.post("/generate_metadata", {}, function (data) {
+                alert("需生成:" + data.need_generate_count + ",已生成:" + data.generate_count);
+            });
+        });
+    });
+</script>
 {% endblock %}
